@@ -92,4 +92,38 @@ const createSale = async (req, res) => {
   }
 }
 
-module.exports = { getSales, createSale }
+const cancelSale = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const sale = await prisma.sale.findUnique({
+      where: { id: parseInt(id) },
+      include: { items: true }
+    })
+
+    if (!sale) return res.status(404).json({ message: 'Venta no encontrada' })
+    if (sale.cancelled) return res.status(400).json({ message: 'Esta venta ya fue anulada' })
+
+    await prisma.$transaction(async (tx) => {
+      // Marcar venta como anulada
+      await tx.sale.update({
+        where: { id: parseInt(id) },
+        data: { cancelled: true }
+      })
+
+      // Devolver stock
+      for (const item of sale.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } }
+        })
+      }
+    })
+
+    res.json({ message: 'Venta anulada correctamente' })
+  } catch (error) {
+    res.status(500).json({ message: 'Error al anular venta', error: error.message })
+  }
+}
+
+module.exports = { getSales, createSale, cancelSale }

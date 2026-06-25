@@ -36,6 +36,17 @@ export default function SalesHistoryPage() {
     setExpanded(expanded === id ? null : id)
   }
 
+  const handleCancel = async (id) => {
+    if (!confirm('¿Estás seguro de que quieres anular esta venta? El stock se devolverá automáticamente.')) return
+    try {
+      await api.delete(`/sales/${id}`)
+      fetchSales()
+      alert('Venta anulada correctamente')
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error al anular venta')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
@@ -77,29 +88,47 @@ export default function SalesHistoryPage() {
           <>
             <div className="space-y-3 mb-6">
               {sales.map(sale => (
-                <div key={sale.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  <div
-                    className="flex justify-between items-center px-5 py-4 cursor-pointer hover:bg-gray-50 transition"
-                    onClick={() => toggleExpand(sale.id)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <span className="text-green-600 font-bold text-sm">#{sale.id}</span>
+                <div key={sale.id} className={`bg-white rounded-xl border overflow-hidden ${sale.cancelled ? 'border-red-200' : 'border-gray-200'}`}>
+                  <div className="flex justify-between items-center px-5 py-4">
+                    <div
+                      className="flex items-center gap-4 flex-1 cursor-pointer"
+                      onClick={() => toggleExpand(sale.id)}
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${sale.cancelled ? 'bg-red-100' : 'bg-green-100'}`}>
+                        <span className={`font-bold text-sm ${sale.cancelled ? 'text-red-500' : 'text-green-600'}`}>
+                          #{sale.id}
+                        </span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-800">
+                        <p className="text-sm font-medium text-gray-800 flex items-center gap-2">
                           {sale.items.length} producto(s) — por {sale.user.name}
+                          {sale.cancelled && (
+                            <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">
+                              Anulada
+                            </span>
+                          )}
                         </p>
                         <p className="text-xs text-gray-400">
                           {new Date(sale.createdAt).toLocaleString('es-DO')}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-lg font-bold text-green-600">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-lg font-bold ${sale.cancelled ? 'text-red-400 line-through' : 'text-green-600'}`}>
                         RD$ {sale.total.toFixed(2)}
                       </span>
-                      <span className="text-gray-400 text-sm">
+                      {!sale.cancelled && (
+                        <button
+                          onClick={() => handleCancel(sale.id)}
+                          className="text-xs text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-2 py-1 rounded-lg transition"
+                        >
+                          Anular
+                        </button>
+                      )}
+                      <span
+                        className="text-gray-400 text-sm cursor-pointer"
+                        onClick={() => toggleExpand(sale.id)}
+                      >
                         {expanded === sale.id ? '▲' : '▼'}
                       </span>
                     </div>
@@ -129,7 +158,9 @@ export default function SalesHistoryPage() {
                         <tfoot>
                           <tr className="border-t-2 border-gray-300">
                             <td colSpan={3} className="pt-2 text-right font-semibold text-gray-700">Total:</td>
-                            <td className="pt-2 font-bold text-green-600">RD$ {sale.total.toFixed(2)}</td>
+                            <td className={`pt-2 font-bold ${sale.cancelled ? 'text-red-400 line-through' : 'text-green-600'}`}>
+                              RD$ {sale.total.toFixed(2)}
+                            </td>
                           </tr>
                         </tfoot>
                       </table>
@@ -139,7 +170,6 @@ export default function SalesHistoryPage() {
               ))}
             </div>
 
-            {/* Paginación */}
             {pages > 1 && (
               <div className="flex justify-center gap-2">
                 <button

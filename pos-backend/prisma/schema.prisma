@@ -45,6 +45,7 @@ model Sale {
   id        Int        @id @default(autoincrement())
   total     Float
   userId    Int
+  cancelled Boolean    @default(false)
   createdAt DateTime   @default(now())
 
   user      User       @relation(fields: [userId], references: [id])
@@ -61,3 +62,4 @@ model SaleItem {
   sale      Sale    @relation(fields: [saleId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
 }
+

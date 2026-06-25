@@ -3,8 +3,11 @@ const prisma = new PrismaClient()
 
 const getSummary = async (req, res) => {
   try {
-    const totalSales = await prisma.sale.count()
-    const totalRevenue = await prisma.sale.aggregate({ _sum: { total: true } })
+    const totalSales = await prisma.sale.count({ where: { cancelled: false } })
+    const totalRevenue = await prisma.sale.aggregate({
+      where: { cancelled: false },
+      _sum: { total: true }
+    })
     const totalProducts = await prisma.product.count({ where: { active: true } })
     const lowStock = await prisma.product.count({ where: { active: true, stock: { lte: 5 } } })
 
@@ -22,6 +25,7 @@ const getSummary = async (req, res) => {
 const getSalesByDay = async (req, res) => {
   try {
     const sales = await prisma.sale.findMany({
+      where: { cancelled: false },
       orderBy: { createdAt: 'asc' },
       select: { total: true, createdAt: true }
     })
@@ -44,6 +48,9 @@ const getTopProducts = async (req, res) => {
   try {
     const items = await prisma.saleItem.groupBy({
       by: ['productId'],
+      where: {
+        sale: { cancelled: false }
+      },
       _sum: { quantity: true },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5
