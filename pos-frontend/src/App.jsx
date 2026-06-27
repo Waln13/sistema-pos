@@ -27,7 +27,7 @@ function App() {
             <ProtectedRoute><SalesPage /></ProtectedRoute>
           } />
           <Route path="/reports" element={
-            <ProtectedRoute><ReportsPage /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={['ADMIN']}><ReportsPage /></ProtectedRoute>
           } />
           <Route path="/users" element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
@@ -35,15 +35,15 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/sales-history" element={
-  <ProtectedRoute><SalesHistoryPage /></ProtectedRoute>
+           <ProtectedRoute allowedRoles={['ADMIN']}><SalesHistoryPage /></ProtectedRoute>
           } />
 
           <Route path="/losses" element={
-  <ProtectedRoute><LossesPage /></ProtectedRoute>
+           <ProtectedRoute allowedRoles={['ADMIN']}><LossesPage /></ProtectedRoute>
           } />
 
           <Route path="/suppliers" element={
-  <ProtectedRoute><SuppliersPage /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={['ADMIN']}><SuppliersPage /></ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

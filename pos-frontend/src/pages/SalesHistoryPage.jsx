@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 export default function SalesHistoryPage() {
   const [sales, setSales] = useState([])
@@ -11,6 +12,7 @@ export default function SalesHistoryPage() {
   const [date, setDate] = useState('')
   const [expanded, setExpanded] = useState(null)
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   useEffect(() => {
     fetchSales()
@@ -117,13 +119,13 @@ export default function SalesHistoryPage() {
                       <span className={`text-lg font-bold ${sale.cancelled ? 'text-red-400 line-through' : 'text-green-600'}`}>
                         RD$ {sale.total.toFixed(2)}
                       </span>
-                      {!sale.cancelled && (
-                        <button
-                          onClick={() => handleCancel(sale.id)}
-                          className="text-xs text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-2 py-1 rounded-lg transition"
-                        >
+                      {!sale.cancelled && user?.role === 'ADMIN' && (
+                         <button
+                           onClick={() => handleCancel(sale.id)}
+                           className="text-xs text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-2 py-1 rounded-lg transition"
+                         >
                           Anular
-                        </button>
+                          </button>
                       )}
                       <span
                         className="text-gray-400 text-sm cursor-pointer"

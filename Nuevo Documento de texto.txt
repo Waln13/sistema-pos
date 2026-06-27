@@ -1,0 +1,25 @@
+✅ Login dark mode profesional
+
+✅ Dashboard con estadísticas en tiempo real
+
+✅ Dark mode / Light mode
+
+✅ Inventario CRUD completo
+
+✅ Ventas con carrito + categorías + cambio
+
+✅ Ticket de venta imprimible
+
+✅ Historial de ventas + anular ventas
+
+✅ Reportes con gráficas + alertas stock bajo
+
+✅ Exportar PDF profesional
+
+✅ Gestión de usuarios con roles
+
+✅ Pérdidas y devoluciones a proveedor
+
+✅ Gestión de proveedores con WhatsApp directo
+
+✅ Deploy en producción — Vercel + Railway
