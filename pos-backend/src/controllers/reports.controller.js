@@ -83,4 +83,61 @@ const getLowStockProducts = async (req, res) => {
   }
 }
 
-module.exports = { getSummary, getSalesByDay, getTopProducts, getLowStockProducts }
+const getProfitReport = async (req, res) => {
+  try {
+    const sales = await prisma.saleItem.findMany({
+      where: {
+        sale: { cancelled: false }
+      },
+      include: {
+        product: { select: { name: true, cost: true } }
+      }
+    })
+
+    const losses = await prisma.productLoss.findMany({
+      include: {
+        product: { select: { name: true, cost: true } }
+      }
+    })
+
+    // Calcular ingresos y costos por producto
+    const productMap = {}
+
+    sales.forEach(item => {
+      const key = item.product.name
+      if (!productMap[key]) {
+        productMap[key] = { name: key, revenue: 0, cost: 0, units: 0 }
+      }
+      productMap[key].revenue += item.unitPrice * item.quantity
+      productMap[key].cost += item.product.cost * item.quantity
+      productMap[key].units += item.quantity
+    })
+
+    const products = Object.values(productMap).map(p => ({
+      ...p,
+      profit: p.revenue - p.cost,
+      margin: p.revenue > 0 ? ((p.revenue - p.cost) / p.revenue * 100).toFixed(1) : 0
+    }))
+
+    // Calcular pérdidas en costo
+    const totalLossCost = losses.reduce((sum, l) => sum + (l.product.cost * l.quantity), 0)
+
+    const totalRevenue = products.reduce((sum, p) => sum + p.revenue, 0)
+    const totalCost = products.reduce((sum, p) => sum + p.cost, 0)
+    const grossProfit = totalRevenue - totalCost
+    const netProfit = grossProfit - totalLossCost
+
+    res.json({
+      totalRevenue,
+      totalCost,
+      grossProfit,
+      totalLossCost,
+      netProfit,
+      products: products.sort((a, b) => b.profit - a.profit)
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener reporte de ganancias', error: error.message })
+  }
+}
+
+module.exports = { getSummary, getSalesByDay, getTopProducts, getLowStockProducts, getProfitReport }

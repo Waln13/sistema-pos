@@ -6,7 +6,7 @@ export default function InventoryPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ name: '', price: '', stock: '', category: '' })
+  const [form, setForm] = useState({ name: '', price: '', cost: '', stock: '', category: '' })
 
   useEffect(() => {
     fetchProducts()
@@ -42,7 +42,7 @@ export default function InventoryPage() {
 
   const handleEdit = (product) => {
     setEditing(product)
-    setForm({ name: product.name, price: product.price, stock: product.stock, category: product.category || '' })
+    setForm({ name: product.name, price: product.price, cost: product.cost || '', stock: product.stock, category: product.category || '' })
     setShowForm(true)
   }
 
@@ -100,6 +100,17 @@ export default function InventoryPage() {
                 required
                 step="0.01"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+                <label className="text-sm text-gray-600 mb-1 block">Precio de costo (RD$)</label>
+                <input
+                type="number"
+                value={form.cost}
+                onChange={e => setForm({ ...form, cost: e.target.value })}
+                step="0.01"
+                placeholder="0.00"
+               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
