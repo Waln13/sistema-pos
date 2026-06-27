@@ -31,3 +31,9 @@ app.use('/api/reports', reportsRoutes)
 
 const usersRoutes = require('./src/routes/users.routes')
 app.use('/api/users', usersRoutes)
+
+const lossesRoutes = require('./src/routes/losses.routes')
+app.use('/api/inventory', lossesRoutes)
+
+const suppliersRoutes = require('./src/routes/suppliers.routes')
+app.use('/api/suppliers', suppliersRoutes)

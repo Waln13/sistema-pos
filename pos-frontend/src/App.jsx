@@ -8,6 +8,8 @@ import SalesPage from './pages/SalesPage'
 import ReportsPage from './pages/ReportsPage'
 import UsersPage from './pages/UsersPage'
 import SalesHistoryPage from './pages/SalesHistoryPage'
+import LossesPage from './pages/LossesPage'
+import SuppliersPage from './pages/SuppliersPage'
 
 function App() {
   return (
@@ -34,6 +36,14 @@ function App() {
           } />
           <Route path="/sales-history" element={
   <ProtectedRoute><SalesHistoryPage /></ProtectedRoute>
+          } />
+
+          <Route path="/losses" element={
+  <ProtectedRoute><LossesPage /></ProtectedRoute>
+          } />
+
+          <Route path="/suppliers" element={
+  <ProtectedRoute><SuppliersPage /></ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
