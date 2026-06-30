@@ -23,3 +23,11 @@
 ✅ Gestión de proveedores con WhatsApp directo
 
 ✅ Deploy en producción — Vercel + Railway
+
+✅ Reporte de ganancias reales
+
+✅ LOTES, Suma ese stock al inventario automáticamente
+Guarda la fecha de vencimiento
+Te avisa 30 días antes — alerta amarilla
+Te avisa 7 días antes — alerta roja crítica
+En reportes muestra los lotes próximos a vencer

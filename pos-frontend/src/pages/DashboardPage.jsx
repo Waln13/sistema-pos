@@ -101,6 +101,21 @@ export default function DashboardPage() {
       </svg>
     )
    },
+
+   {
+  title: 'Lotes',
+  description: 'Control de vencimientos',
+  path: '/lots',
+  color: 'from-indigo-600 to-indigo-700',
+  shadow: 'shadow-indigo-500/20',
+  roles: ['ADMIN'],
+  icon: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+  )
+  },
+  
     {
     title: 'Historial',
     description: 'Ver todas las ventas',

@@ -37,3 +37,6 @@ app.use('/api/inventory', lossesRoutes)
 
 const suppliersRoutes = require('./src/routes/suppliers.routes')
 app.use('/api/suppliers', suppliersRoutes)
+
+const lotsRoutes = require('./src/routes/lots.routes')
+app.use('/api/lots', lotsRoutes)
