@@ -140,4 +140,82 @@ const getProfitReport = async (req, res) => {
   }
 }
 
-module.exports = { getSummary, getSalesByDay, getTopProducts, getLowStockProducts, getProfitReport }
+const getWeeklyComparison = async (req, res) => {
+  try {
+    const now = new Date()
+
+    // Esta semana — lunes a hoy
+    const startOfThisWeek = new Date(now)
+    startOfThisWeek.setDate(now.getDate() - now.getDay() + 1)
+    startOfThisWeek.setHours(0, 0, 0, 0)
+
+    // Semana pasada — lunes a domingo anterior
+    const startOfLastWeek = new Date(startOfThisWeek)
+    startOfLastWeek.setDate(startOfThisWeek.getDate() - 7)
+
+    const endOfLastWeek = new Date(startOfThisWeek)
+    endOfLastWeek.setMilliseconds(-1)
+
+    const [thisWeekSales, lastWeekSales] = await Promise.all([
+      prisma.sale.findMany({
+        where: {
+          cancelled: false,
+          createdAt: { gte: startOfThisWeek }
+        },
+        select: { total: true, createdAt: true }
+      }),
+      prisma.sale.findMany({
+        where: {
+          cancelled: false,
+          createdAt: { gte: startOfLastWeek, lte: endOfLastWeek }
+        },
+        select: { total: true, createdAt: true }
+      })
+    ])
+
+    // Agrupar por día de la semana
+    const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+
+    const thisWeekByDay = Array(7).fill(0)
+    const lastWeekByDay = Array(7).fill(0)
+
+    thisWeekSales.forEach(sale => {
+      const day = new Date(sale.createdAt).getDay()
+      const index = day === 0 ? 6 : day - 1
+      thisWeekByDay[index] += sale.total
+    })
+
+    lastWeekSales.forEach(sale => {
+      const day = new Date(sale.createdAt).getDay()
+      const index = day === 0 ? 6 : day - 1
+      lastWeekByDay[index] += sale.total
+    })
+
+    const comparison = days.map((day, i) => ({
+      day,
+      thisWeek: thisWeekByDay[i],
+      lastWeek: lastWeekByDay[i]
+    }))
+
+    const thisWeekTotal = thisWeekSales.reduce((sum, s) => sum + s.total, 0)
+    const lastWeekTotal = lastWeekSales.reduce((sum, s) => sum + s.total, 0)
+    const difference = thisWeekTotal - lastWeekTotal
+    const percentChange = lastWeekTotal > 0
+      ? ((difference / lastWeekTotal) * 100).toFixed(1)
+      : 100
+
+    res.json({
+      comparison,
+      thisWeekTotal,
+      lastWeekTotal,
+      difference,
+      percentChange,
+      thisWeekCount: thisWeekSales.length,
+      lastWeekCount: lastWeekSales.length
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener comparativa', error: error.message })
+  }
+}
+
+module.exports = { getSummary, getSalesByDay, getTopProducts, getLowStockProducts, getProfitReport, getWeeklyComparison }
