@@ -12,6 +12,7 @@ import LossesPage from './pages/LossesPage'
 import SuppliersPage from './pages/SuppliersPage'
 import ProfitPage from './pages/ProfitPage'
 import LotsPage from './pages/LotsPage'
+import BackupPage from './pages/BackupPage'
 
 function App() {
   return (
@@ -53,7 +54,11 @@ function App() {
           } />
 
           <Route path="/lots" element={
-  <ProtectedRoute allowedRoles={['ADMIN']}><LotsPage /></ProtectedRoute>
+            <ProtectedRoute allowedRoles={['ADMIN']}><LotsPage /></ProtectedRoute>
+          } />
+
+          <Route path="/backup" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}><BackupPage /></ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
